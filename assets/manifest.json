@@ -1,0 +1,30 @@
+{
+	"Name": "Usage",
+	"Author": "ImDevinC",
+	"Version": "1.0.0",
+	"Category": "OpenCode",
+	"Icon": "icon",
+	"CategoryIcon": "opencode",
+	"OS": [{ "Platform": "windows" }, { "Platform": "mac" }, { "Platform": "linux" }],
+	"CodePaths": {
+		"x86_64-pc-windows-msvc": "oaopencode-usage-x86_64-pc-windows-msvc.exe",
+		"x86_64-apple-darwin": "oaopencode-usage-x86_64-apple-darwin",
+		"aarch64-apple-darwin": "oaopencode-usage-aarch64-apple-darwin",
+		"x86_64-unknown-linux-gnu": "oaopencode-usage-x86_64-unknown-linux-gnu",
+		"aarch64-unknown-linux-gnu": "oaopencode-usage-aarch64-unknown-linux-gnu"
+	},
+	"CodePathWin": "oaopencode-usage-x86_64-pc-windows-msvc.exe",
+	"CodePathMac": "oaopencode-usage-x86_64-apple-darwin",
+	"CodePathLin": "oaopencode-usage-x86_64-unknown-linux-gnu",
+	"PropertyInspectorPath": "pi.html",
+	"Actions": [
+		{
+			"UUID": "com.opendeck.opencodeusage.usage",
+			"Name": "Usage",
+			"Icon": "actions/icon",
+			"Tooltip": "Shows your opencode API usage with a circular progress ring",
+			"Controllers": ["Keypad"],
+			"States": [{ "Title": "Usage", "ShowTitle": false }]
+		}
+	]
+}
