@@ -1,3 +1,4 @@
 /target
 /stage
 *.sdPlugin/
+/*.zip

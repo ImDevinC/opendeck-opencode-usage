@@ -1,4 +1,5 @@
 PLUGIN_DIR := com.opendeck.opencodeusage.sdPlugin
+BUNDLE_ID := $(basename $(PLUGIN_DIR))
 PACKAGE := oaopencode-usage
 
 UNAME_S := $(shell uname -s)
@@ -12,7 +13,7 @@ endif
 
 BINARY := $(PACKAGE)-$(TRIPLE)
 
-.PHONY: all build stage install clean
+.PHONY: all build stage package install clean
 
 all: build
 
@@ -30,10 +31,14 @@ stage: build
 	cp assets/opencode.png $(PLUGIN_DIR)/opencode.png
 	cp assets/actions/icon.svg $(PLUGIN_DIR)/actions/icon.svg
 
+package: stage
+	rm -f $(BUNDLE_ID).zip
+	zip -rq $(BUNDLE_ID).zip $(PLUGIN_DIR)
+
 install: stage
 	mkdir -p "$(OPENDECK_CONFIG)/plugins"
 	cp -r $(PLUGIN_DIR) "$(OPENDECK_CONFIG)/plugins/"
 
 clean:
 	cargo clean
-	rm -rf stage $(PLUGIN_DIR)
+	rm -rf stage $(PLUGIN_DIR) $(BUNDLE_ID).zip

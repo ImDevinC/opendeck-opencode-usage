@@ -1,0 +1,175 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  bump:
+    name: Bump version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: read
+      pull-requests: read
+    outputs:
+      version: ${{ steps.semver.outputs.version }}
+      release-notes: ${{ steps.semver.outputs.release-notes }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Bump version and tag
+        id: semver
+        uses: jefflinse/pr-semver-bump@v1.7.1
+        with:
+          mode: bump
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          minor-label: minor
+          major-label: major
+          patch-label: patch
+          with-v: true
+
+  build:
+    name: Build ${{ matrix.target }}
+    needs: bump
+    if: needs.bump.outputs.version != ''
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            suffix: x86_64-pc-windows-msvc.exe
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            suffix: x86_64-apple-darwin
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            suffix: aarch64-apple-darwin
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-22.04
+            suffix: x86_64-unknown-linux-gnu
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-22.04-arm
+            suffix: aarch64-unknown-linux-gnu
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Set up Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - name: Build binary
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Rename binary (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: Move-Item "target\${{ matrix.target }}\release\oaopencode-usage.exe" "oaopencode-usage-${{ matrix.suffix }}"
+
+      - name: Rename binary (Unix)
+        if: matrix.os != 'windows-latest'
+        run: mv "target/${{ matrix.target }}/release/oaopencode-usage" "oaopencode-usage-${{ matrix.suffix }}"
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: oaopencode-usage-${{ matrix.suffix }}
+          path: oaopencode-usage-${{ matrix.suffix }}
+          compression-level: 0
+          if-no-files-found: error
+
+  package:
+    name: Package and release
+    needs: [bump, build]
+    if: needs.bump.outputs.version != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: bin
+          pattern: oaopencode-usage-*
+          merge-multiple: true
+
+      - name: Set version variables
+        id: version
+        run: |
+          VERSION="${{ needs.bump.outputs.version }}"
+          VERSION="${VERSION#[vV]}"
+          echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Write version into Cargo.toml and manifest
+        run: |
+          sed -i "s/^version = .*/version = \"${{ steps.version.outputs.version }}\"/" Cargo.toml
+          sed -i "s/\"Version\": \".*\"/\"Version\": \"${{ steps.version.outputs.version }}\"/" assets/manifest.json
+
+      - name: Assemble plugin bundle
+        run: |
+          mkdir -p com.opendeck.opencodeusage.sdPlugin/actions
+          cp assets/manifest.json com.opendeck.opencodeusage.sdPlugin/manifest.json
+          cp assets/pi.html com.opendeck.opencodeusage.sdPlugin/pi.html
+          cp assets/icon.svg com.opendeck.opencodeusage.sdPlugin/icon.svg
+          cp assets/opencode.png com.opendeck.opencodeusage.sdPlugin/opencode.png
+          cp assets/actions/icon.svg com.opendeck.opencodeusage.sdPlugin/actions/icon.svg
+          cp bin/oaopencode-usage-* com.opendeck.opencodeusage.sdPlugin/
+
+      - name: Verify bundle
+        run: |
+          test -f com.opendeck.opencodeusage.sdPlugin/manifest.json
+          test "$(ls -1 com.opendeck.opencodeusage.sdPlugin/oaopencode-usage-* | wc -l)" = "5"
+
+      - name: Create archive
+        run: zip -rq com.opendeck.opencodeusage.zip com.opendeck.opencodeusage.sdPlugin
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: com.opendeck.opencodeusage.zip
+          path: com.opendeck.opencodeusage.zip
+          if-no-files-found: error
+
+      - name: Commit version and update tag
+        id: tag
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if ! git diff --quiet; then
+            git commit -am "Release ${{ steps.version.outputs.tag }}"
+          fi
+
+          git tag -fa "${{ steps.version.outputs.tag }}" -m "${{ steps.version.outputs.tag }}"
+
+          git push origin main
+          git push origin "${{ steps.version.outputs.tag }}" --force
+
+      - name: Create GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          name: ${{ steps.version.outputs.tag }}
+          tag: ${{ steps.version.outputs.tag }}
+          body: ${{ needs.bump.outputs.release-notes }}
+          token: ${{ github.token }}
+          artifacts: com.opendeck.opencodeusage.zip
