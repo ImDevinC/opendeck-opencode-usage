@@ -9,6 +9,8 @@ The action shows a circular progress ring on the key:
 - Center text: time until the next usage reset (e.g. `6 min.`, `2 hr`, `5 days`).
 - Mode label at the top: `ROLLING`, `WEEKLY`, or `MONTHLY`.
 
+![Usage action example](example.png)
+
 ## Requirements
 
 - Rust (stable) to build.
