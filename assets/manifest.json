@@ -19,7 +19,7 @@
 	"PropertyInspectorPath": "pi.html",
 	"Actions": [
 		{
-			"UUID": "com.opendeck.opencodeusage.usage",
+			"UUID": "com.imdevinc.opencodeusage.usage",
 			"Name": "Usage",
 			"Icon": "actions/icon",
 			"Tooltip": "Shows your opencode API usage with a circular progress ring",

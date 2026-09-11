@@ -22,7 +22,7 @@ The action shows a circular progress ring on the key:
 make install
 ```
 
-This builds the plugin, stages it into `com.opendeck.opencodeusage.sdPlugin/`, and copies it into your OpenDeck plugins directory:
+This builds the plugin, stages it into `com.imdevinc.opencodeusage.sdPlugin/`, and copies it into your OpenDeck plugins directory:
 
 - Linux: `~/.config/opendeck/plugins/` (or `$XDG_CONFIG_HOME/opendeck/plugins/`)
 - macOS: `~/Library/Application Support/OpenDeck/plugins/`
@@ -31,13 +31,13 @@ Restart OpenDeck (or reload plugins) and add the **Usage** action from the `Open
 
 ### Manual install
 
-Run `make stage` to produce `com.opendeck.opencodeusage.sdPlugin/`, then copy that folder into your OpenDeck plugins directory (found via **Open config directory** in OpenDeck settings → `plugins/`).
+Run `make stage` to produce `com.imdevinc.opencodeusage.sdPlugin/`, then copy that folder into your OpenDeck plugins directory (found via **Open config directory** in OpenDeck settings → `plugins/`).
 
 ## Packaging & releases
 
-Run `make package` to assemble the plugin bundle and zip it into `com.opendeck.opencodeusage.zip`. The archive contains `com.opendeck.opencodeusage.sdPlugin/` and can be installed in OpenDeck via **Install from file**.
+Run `make package` to assemble the plugin bundle and zip it into `com.imdevinc.opencodeusage.zip`. The archive contains `com.imdevinc.opencodeusage.sdPlugin/` and can be installed in OpenDeck via **Install from file**.
 
-Releases are driven by PR labels. Every pull request to `main` must carry exactly one of the `major`, `minor`, or `patch` labels (validated by `.github/workflows/pr.yaml`). On merge, `.github/workflows/build.yml` bumps the version from that label, builds all five platform binaries (Windows, macOS, Linux; x86_64 + arm64), assembles the bundle, and publishes a GitHub Release with `com.opendeck.opencodeusage.zip` attached. CI writes the new version back into `Cargo.toml` and `assets/manifest.json` so they stay in sync with the release tag.
+Releases are driven by PR labels. Every pull request to `main` must carry exactly one of the `major`, `minor`, or `patch` labels (validated by `.github/workflows/pr.yaml`). On merge, `.github/workflows/build.yml` bumps the version from that label, builds all five platform binaries (Windows, macOS, Linux; x86_64 + arm64), assembles the bundle, and publishes a GitHub Release with `com.imdevinc.opencodeusage.zip` attached. CI writes the new version back into `Cargo.toml` and `assets/manifest.json` so they stay in sync with the release tag.
 
 ## Configuration
 
