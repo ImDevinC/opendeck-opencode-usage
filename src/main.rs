@@ -256,7 +256,7 @@ struct UsageAction;
 
 #[async_trait]
 impl Action for UsageAction {
-	const UUID: ActionUuid = "com.opendeck.opencodeusage.usage";
+	const UUID: ActionUuid = "com.imdevinc.opencodeusage.usage";
 	type Settings = UsageSettings;
 
 	async fn will_appear(&self, instance: &Instance, settings: &Self::Settings) -> OpenActionResult<()> {

@@ -1,4 +1,4 @@
-PLUGIN_DIR := com.opendeck.opencodeusage.sdPlugin
+PLUGIN_DIR := com.imdevinc.opencodeusage.sdPlugin
 BUNDLE_ID := $(basename $(PLUGIN_DIR))
 PACKAGE := oaopencode-usage
 

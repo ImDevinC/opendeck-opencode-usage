@@ -125,27 +125,27 @@ jobs:
 
       - name: Assemble plugin bundle
         run: |
-          mkdir -p com.opendeck.opencodeusage.sdPlugin/actions
-          cp assets/manifest.json com.opendeck.opencodeusage.sdPlugin/manifest.json
-          cp assets/pi.html com.opendeck.opencodeusage.sdPlugin/pi.html
-          cp assets/icon.svg com.opendeck.opencodeusage.sdPlugin/icon.svg
-          cp assets/opencode.png com.opendeck.opencodeusage.sdPlugin/opencode.png
-          cp assets/actions/icon.svg com.opendeck.opencodeusage.sdPlugin/actions/icon.svg
-          cp bin/oaopencode-usage-* com.opendeck.opencodeusage.sdPlugin/
+          mkdir -p com.imdevinc.opencodeusage.sdPlugin/actions
+          cp assets/manifest.json com.imdevinc.opencodeusage.sdPlugin/manifest.json
+          cp assets/pi.html com.imdevinc.opencodeusage.sdPlugin/pi.html
+          cp assets/icon.svg com.imdevinc.opencodeusage.sdPlugin/icon.svg
+          cp assets/opencode.png com.imdevinc.opencodeusage.sdPlugin/opencode.png
+          cp assets/actions/icon.svg com.imdevinc.opencodeusage.sdPlugin/actions/icon.svg
+          cp bin/oaopencode-usage-* com.imdevinc.opencodeusage.sdPlugin/
 
       - name: Verify bundle
         run: |
-          test -f com.opendeck.opencodeusage.sdPlugin/manifest.json
-          test "$(ls -1 com.opendeck.opencodeusage.sdPlugin/oaopencode-usage-* | wc -l)" = "5"
+          test -f com.imdevinc.opencodeusage.sdPlugin/manifest.json
+          test "$(ls -1 com.imdevinc.opencodeusage.sdPlugin/oaopencode-usage-* | wc -l)" = "5"
 
       - name: Create archive
-        run: zip -rq com.opendeck.opencodeusage.zip com.opendeck.opencodeusage.sdPlugin
+        run: zip -rq com.imdevinc.opencodeusage.zip com.imdevinc.opencodeusage.sdPlugin
 
       - name: Upload archive
         uses: actions/upload-artifact@v4
         with:
-          name: com.opendeck.opencodeusage.zip
-          path: com.opendeck.opencodeusage.zip
+          name: com.imdevinc.opencodeusage.zip
+          path: com.imdevinc.opencodeusage.zip
           if-no-files-found: error
 
       - name: Commit version and update tag
@@ -172,4 +172,4 @@ jobs:
           tag: ${{ steps.version.outputs.tag }}
           body: ${{ needs.bump.outputs.release-notes }}
           token: ${{ github.token }}
-          artifacts: com.opendeck.opencodeusage.zip
+          artifacts: com.imdevinc.opencodeusage.zip
